@@ -71,7 +71,9 @@ app.get('/health', (req, res) => {
     success: true,
     message: 'Food Delivery Business App Backend is running!',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    version: '1.0.1',
+    cors: 'enabled'
   });
 });
 
