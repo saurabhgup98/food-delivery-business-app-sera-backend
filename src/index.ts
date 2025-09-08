@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import connectDatabase from './config/database';
 
 // Import routes
@@ -78,8 +79,19 @@ app.get('/health', (req, res) => {
     message: 'Food Delivery Business App Backend is running!',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    version: '1.0.1',
-    cors: 'enabled'
+    version: '1.0.2',
+    cors: 'enabled',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    mongodb_uri: process.env.MONGODB_URI ? 'set' : 'not set'
+  });
+});
+
+// Simple test endpoint
+app.get('/test', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Test endpoint working!',
+    timestamp: new Date().toISOString()
   });
 });
 
