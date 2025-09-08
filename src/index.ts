@@ -3,9 +3,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDatabase from './config/database';
 
-// Import only test routes
+// Import routes
 import testRoutes from './routes/test';
 import dashboardRoutes from './routes/dashboard';
+import activitiesRoutes from './routes/activities';
 
 // Load environment variables
 dotenv.config();
@@ -13,8 +14,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Connect to MongoDB (commented out for testing)
-// connectDatabase();
+// Connect to MongoDB
+connectDatabase();
 
 // Middleware - Simplified CORS for Vercel
 app.use(cors({
@@ -40,7 +41,7 @@ app.use((req, res, next) => {
     'https://food-delivery-business-app-sera-d1wiulenw.vercel.app'
   ];
   
-  if (allowedOrigins.includes(origin)) {
+  if (origin && allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
   }
   
@@ -78,9 +79,10 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes - Only test routes for now
+// API Routes
 app.use('/api/test', testRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/activities', activitiesRoutes);
 
 // 404 handler
 app.use((req, res) => {
