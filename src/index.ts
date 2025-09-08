@@ -14,8 +14,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Connect to MongoDB
-connectDatabase();
+// Connect to MongoDB (optional for serverless)
+connectDatabase().catch((error) => {
+  console.error('Database connection failed:', error);
+  // Don't exit in serverless environment
+});
 
 // Middleware - Enhanced CORS for Vercel
 app.use(cors({

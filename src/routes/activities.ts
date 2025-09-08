@@ -1,11 +1,26 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Activity from '../models/Activity';
 
 const router = express.Router();
 
+// Check database connection
+const checkDatabaseConnection = () => {
+  return mongoose.connection.readyState === 1;
+};
+
 // Get activities for admin
 router.get('/admin', async (req, res) => {
   try {
+    // Check database connection
+    if (!checkDatabaseConnection()) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection not available',
+        data: { activities: [], pagination: { total: 0, page: 1, limit: 20, pages: 0 } }
+      });
+    }
+
     const { limit = 20, page = 1 } = req.query;
     const skip = (Number(page) - 1) * Number(limit);
 
@@ -18,7 +33,7 @@ router.get('/admin', async (req, res) => {
 
     const total = await Activity.countDocuments({ targetRole: 'admin' });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: 'Admin activities retrieved successfully',
       data: {
@@ -33,7 +48,7 @@ router.get('/admin', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching admin activities:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to fetch admin activities',
       error: error instanceof Error ? error.message : 'Unknown error'
