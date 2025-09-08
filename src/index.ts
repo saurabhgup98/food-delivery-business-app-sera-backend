@@ -5,6 +5,7 @@ import connectDatabase from './config/database';
 
 // Import only test routes
 import testRoutes from './routes/test';
+import dashboardRoutes from './routes/dashboard';
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.get('/health', (req, res) => {
 
 // API Routes - Only test routes for now
 app.use('/api/test', testRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // 404 handler
 app.use((req, res) => {
