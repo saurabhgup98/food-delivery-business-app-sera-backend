@@ -104,6 +104,7 @@ app.listen(PORT, () => {
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📱 Frontend URL: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
   console.log(`🔗 Health Check: http://localhost:${PORT}/health`);
+  console.log(`🔧 CORS: Configured for Vercel deployment`);
 });
 
 export default app;
