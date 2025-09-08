@@ -1,13 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
-import connectDatabase from './config/database';
-
-// Import routes
-import testRoutes from './routes/test';
-import dashboardRoutes from './routes/dashboard';
-import activitiesRoutes from './routes/activities';
 
 // Load environment variables
 dotenv.config();
@@ -15,11 +8,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Connect to MongoDB (optional for serverless)
-connectDatabase().catch((error) => {
-  console.error('Database connection failed:', error);
-  // Don't exit in serverless environment
-});
+console.log('Starting server...');
 
 // Middleware - Enhanced CORS for Vercel
 app.use(cors({
@@ -74,20 +63,20 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  console.log('Health check requested');
   res.status(200).json({
     success: true,
     message: 'Food Delivery Business App Backend is running!',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    version: '1.0.2',
-    cors: 'enabled',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-    mongodb_uri: process.env.MONGODB_URI ? 'set' : 'not set'
+    version: '1.0.3',
+    cors: 'enabled'
   });
 });
 
 // Simple test endpoint
 app.get('/test', (req, res) => {
+  console.log('Test endpoint requested');
   res.status(200).json({
     success: true,
     message: 'Test endpoint working!',
@@ -118,10 +107,10 @@ app.options('*', (req, res) => {
   res.status(200).end();
 });
 
-// API Routes
-app.use('/api/test', testRoutes);
-app.use('/api/dashboard', dashboardRoutes);
-app.use('/api/activities', activitiesRoutes);
+// API Routes (commented out for debugging)
+// app.use('/api/test', testRoutes);
+// app.use('/api/dashboard', dashboardRoutes);
+// app.use('/api/activities', activitiesRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -142,13 +131,17 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📱 Frontend URL: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
-  console.log(`🔗 Health Check: http://localhost:${PORT}/health`);
-  console.log(`🔧 CORS: Configured for Vercel deployment`);
-});
+// Start server (only in non-serverless environment)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📱 Frontend URL: ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
+    console.log(`🔗 Health Check: http://localhost:${PORT}/health`);
+    console.log(`🔧 CORS: Configured for Vercel deployment`);
+  });
+}
+
+console.log('Server setup complete');
 
 export default app;
