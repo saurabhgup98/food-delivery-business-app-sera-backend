@@ -111,14 +111,14 @@ router.post('/', async (req, res) => {
 
     await activity.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: 'Activity created successfully',
       data: { activityId: activity._id }
     });
   } catch (error) {
     console.error('Error creating activity:', error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: 'Failed to create activity',
       error: error instanceof Error ? error.message : 'Unknown error'

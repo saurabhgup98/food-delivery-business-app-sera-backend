@@ -17,7 +17,7 @@ const PORT = process.env.PORT || 5001;
 // Connect to MongoDB
 connectDatabase();
 
-// Middleware - Simplified CORS for Vercel
+// Middleware - Enhanced CORS for Vercel
 app.use(cors({
   origin: [
     'http://localhost:5173',
@@ -27,8 +27,9 @@ app.use(cors({
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  optionsSuccessStatus: 200
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  optionsSuccessStatus: 200,
+  preflightContinue: false
 }));
 
 // Additional CORS headers for all responses
@@ -63,7 +64,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request logging middleware
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path} - Origin: ${req.headers.origin}`);
   next();
 });
 
@@ -77,6 +78,29 @@ app.get('/health', (req, res) => {
     version: '1.0.1',
     cors: 'enabled'
   });
+});
+
+// Explicit OPTIONS handler for all routes
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://food-delivery-business-app-sera.vercel.app',
+    'https://food-delivery-business-app-sera-d1wiulenw.vercel.app'
+  ];
+  
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  
+  console.log('OPTIONS request handled for:', req.originalUrl);
+  res.status(200).end();
 });
 
 // API Routes
