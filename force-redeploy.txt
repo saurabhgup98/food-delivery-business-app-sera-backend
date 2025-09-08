@@ -1,3 +1,4 @@
-Force redeploy - CORS fix
-Timestamp: 2025-01-08 09:30:00
-Reason: Fix CORS preflight handling for Vercel deployment
+Force redeploy - CORS fix v3
+Timestamp: 2025-01-08 09:50:00
+Reason: Simplified CORS configuration for Vercel deployment
+Changes: Added explicit CORS headers middleware

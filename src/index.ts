@@ -16,44 +16,45 @@ const PORT = process.env.PORT || 5001;
 // Connect to MongoDB (commented out for testing)
 // connectDatabase();
 
-// Middleware - CORS configuration
-const allowedOrigins = [
-  'http://localhost:5173', // Local frontend
-  'http://localhost:3000', // Alternative local port
-  'https://food-delivery-business-app-sera.vercel.app', // Vercel frontend
-  'https://food-delivery-business-app-sera-d1wiulenw.vercel.app' // Alternative Vercel URL
-];
-
+// Middleware - Simplified CORS for Vercel
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    
-    // For development, allow all origins
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-    
-    return callback(new Error('Not allowed by CORS'));
-  },
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://food-delivery-business-app-sera.vercel.app',
+    'https://food-delivery-business-app-sera-d1wiulenw.vercel.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  preflightContinue: false,
   optionsSuccessStatus: 200
 }));
 
-// Handle preflight requests explicitly
-app.options('*', (req, res) => {
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+// Additional CORS headers for all responses
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://food-delivery-business-app-sera.vercel.app',
+    'https://food-delivery-business-app-sera-d1wiulenw.vercel.app'
+  ];
+  
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.header('Access-Control-Allow-Credentials', 'true');
-  res.sendStatus(200);
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+  
+  next();
 });
 
 app.use(express.json({ limit: '10mb' }));
